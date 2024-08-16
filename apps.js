@@ -1,8 +1,8 @@
-// Import the functions you need from the Firebase SDK
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
-// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDLKPOqok8VS3gR4TAEGCEH4IEJL8kKpvw",
   authDomain: "ind-edu-f63b0.firebaseapp.com",
@@ -13,47 +13,94 @@ const firebaseConfig = {
   measurementId: "G-BZPXLELM3J"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
-// Show/Hide forms
-document.getElementById('show-signup').addEventListener('click', function(event) {
-    event.preventDefault();
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('signup-form').style.display = 'block';
+const submitButton = document.getElementById("submit");
+const signupButton = document.getElementById("sign-up");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const main = document.getElementById("main");
+const createacct = document.getElementById("create-acct")
+
+const signupEmailIn = document.getElementById("email-signup");
+const confirmSignupEmailIn = document.getElementById("confirm-email-signup");
+const signupPasswordIn = document.getElementById("password-signup");
+const confirmSignUpPasswordIn = document.getElementById("confirm-password-signup");
+const createacctbtn = document.getElementById("create-acct-btn");
+
+const returnBtn = document.getElementById("return-btn");
+
+var email, password, signupEmail, signupPassword, confirmSignupEmail, confirmSignUpPassword;
+
+createacctbtn.addEventListener("click", function() {
+  var isVerified = true;
+
+  signupEmail = signupEmailIn.value;
+  confirmSignupEmail = confirmSignupEmailIn.value;
+  if(signupEmail != confirmSignupEmail) {
+      window.alert("Email fields do not match. Try again.")
+      isVerified = false;
+  }
+
+  signupPassword = signupPasswordIn.value;
+  confirmSignUpPassword = confirmSignUpPasswordIn.value;
+  if(signupPassword != confirmSignUpPassword) {
+      window.alert("Password fields do not match. Try again.")
+      isVerified = false;
+  }
+  
+  if(signupEmail == null || confirmSignupEmail == null || signupPassword == null || confirmSignUpPassword == null) {
+    window.alert("Please fill out all required fields.");
+    isVerified = false;
+  }
+  
+  if(isVerified) {
+    createUserWithEmailAndPassword(auth, signupEmail, signupPassword)
+      .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+      window.alert("Success! Account created.");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
+      window.alert("Error occurred. Try again.");
+    });
+  }
 });
 
-document.getElementById('show-login').addEventListener('click', function(event) {
-    event.preventDefault();
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('signup-form').style.display = 'none';
+submitButton.addEventListener("click", function() {
+  email = emailInput.value;
+  console.log(email);
+  password = passwordInput.value;
+  console.log(password);
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      console.log("Success! Welcome back!");
+      window.alert("Success! Welcome back!");
+      // ...
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("Error occurred. Try again.");
+      window.alert("Error occurred. Try again.");
+    });
 });
 
-// Login function
-document.getElementById('login-btn').addEventListener('click', function() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-
-    signInWithEmailAndPassword(auth, email, password)
-        .then(userCredential => {
-            console.log('Logged in as:', userCredential.user.email);
-        })
-        .catch(error => {
-            console.error('Error logging in:', error.message);
-        });
+signupButton.addEventListener("click", function() {
+    main.style.display = "none";
+    createacct.style.display = "block";
 });
 
-// Sign up function
-document.getElementById('signup-btn').addEventListener('click', function() {
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-
-    createUserWithEmailAndPassword(auth, email, password)
-        .then(userCredential => {
-            console.log('Signed up as:', userCredential.user.email);
-        })
-        .catch(error => {
-            console.error('Error signing up:', error.message);
-        });
+returnBtn.addEventListener("click", function() {
+    main.style.display = "block";
+    createacct.style.display = "none";
 });
